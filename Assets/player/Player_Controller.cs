@@ -1,13 +1,15 @@
 using UnityEngine;
 
 public class Player_Controller : MonoBehaviour {
+    // Components
+    private Rigidbody2D rb;
+
+    #region Movement
     [SerializeField] private protected float startSpeed, minSpeed, maxSpeed, acceleration, slowdown;
     private protected float speed, lastDirection;
     private byte playerFlipToRIgh, playerFlipToLeft;
-
-    private Rigidbody2D rb;
-
     private const string INPUT_AXIS_HORIZONTAL = "Horizontal";
+    #endregion
 
     // Start is called before the first frame update
     void Start() {
@@ -19,6 +21,7 @@ public class Player_Controller : MonoBehaviour {
         MovePlayer();
     }
 
+    // Movement the player Object and Flip
     private void MovePlayer() {
         float axisHorizontal = Input.GetAxis(INPUT_AXIS_HORIZONTAL);
         rb.velocity = new Vector2(speed * lastDirection, rb.velocity.y);
