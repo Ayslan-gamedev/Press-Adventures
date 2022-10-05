@@ -13,6 +13,9 @@ public class Player_Controller : MonoBehaviour {
 
     #region Jump
     [SerializeField] private protected float jumpImpulse;
+    [SerializeField] protected float timeToCoyoteTime;
+    private float coyoteTimer = 0;
+    byte jump = 0;
     #endregion
 
     // Start is called before the first frame update
@@ -59,17 +62,34 @@ public class Player_Controller : MonoBehaviour {
             else speed = 0;
         }
     }
-    
+
     private void JumpPlayer() {
-        bool groundHit() {
+        bool CanJump() {
             RaycastHit2D groundHit = Physics2D.Raycast(transform.position, Vector2.down, 0.2f, 1 << 7);
             RaycastHit2D groundHit2 = Physics2D.Raycast(new Vector2(transform.position.x - 0.2f, transform.position.y), Vector2.down, 0.2f, 1 << 7);
             RaycastHit2D groundHit3 = Physics2D.Raycast(new Vector2(transform.position.x + 0.2f, transform.position.y), Vector2.down, 0.2f, 1 << 7);
 
-            if(groundHit.collider == true || groundHit2.collider == true || groundHit3.collider == true) return true;
-            else return false;
+            if(groundHit.collider == true || groundHit2.collider == true || groundHit3.collider == true) {
+                jump = 0;
+                coyoteTimer = 0;
+                return true;
+            }
+            else{
+                if(coyoteTimer < timeToCoyoteTime && jump == 0) {
+                    coyoteTimer += 0.025f;
+                    return true;
+                }
+                else {
+                    coyoteTimer = timeToCoyoteTime;
+                    return false;
+                }
+            }
         }
 
-        if(groundHit() == true && Input.GetKeyDown(KeyCode.Space)) rb.AddForce(Vector2.up * jumpImpulse, ForceMode2D.Impulse);
+        if(CanJump() == true && Input.GetKeyDown(KeyCode.Space)) {
+            rb.AddForce(Vector2.up * jumpImpulse, ForceMode2D.Impulse);
+            jump = 1;
+            Debug.Log(coyoteTimer);
+        }
     }
 }
