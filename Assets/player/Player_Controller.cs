@@ -3,6 +3,8 @@ using UnityEngine;
 public class Player_Controller : MonoBehaviour {
     // Components
     private Rigidbody2D rb;
+    private Animator animatorController;
+    private enum Player_Animations { Idle, Walk, Jump, Dash, Shot }
 
     #region Movement
     [SerializeField] private protected float startSpeed, minSpeed, maxSpeed, acceleration, slowdown;
@@ -21,6 +23,7 @@ public class Player_Controller : MonoBehaviour {
     // Start is called before the first frame update
     void Start() {
         rb = GetComponent<Rigidbody2D>();
+        animatorController = GetComponent<Animator>();
     }
 
     // Update is called once per frame
@@ -35,8 +38,8 @@ public class Player_Controller : MonoBehaviour {
         rb.velocity = new Vector2(speed * lastDirection, rb.velocity.y);
 
         if(axisHorizontal != 0) {
-            // creates a fixed direction for the player to slide
             lastDirection = axisHorizontal;
+            ChangeAnimation(Player_Animations.Walk);
 
             if(speed < minSpeed) speed = minSpeed;
 
@@ -57,12 +60,14 @@ public class Player_Controller : MonoBehaviour {
             #endregion
         }
         else {
-            if(speed > 0)
-                speed -= slowdown * Time.deltaTime;
+            ChangeAnimation(Player_Animations.Idle);
+            
+            if(speed > 0) speed -= slowdown * Time.deltaTime;
             else speed = 0;
         }
     }
 
+    // Jump the player Object
     private void JumpPlayer() {
         bool CanJump() {
             RaycastHit2D groundHit = Physics2D.Raycast(transform.position, Vector2.down, 0.2f, 1 << 7);
@@ -89,7 +94,11 @@ public class Player_Controller : MonoBehaviour {
         if(CanJump() == true && Input.GetKeyDown(KeyCode.Space)) {
             rb.AddForce(Vector2.up * jumpImpulse, ForceMode2D.Impulse);
             jump = 1;
-            Debug.Log(coyoteTimer);
         }
+    }
+
+    // Manager Sprite Animations 
+    private void ChangeAnimation(Player_Animations animation) {
+        animatorController.Play(animation.ToString());
     }
 }
