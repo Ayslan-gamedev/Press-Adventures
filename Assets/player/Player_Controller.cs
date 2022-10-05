@@ -11,6 +11,10 @@ public class Player_Controller : MonoBehaviour {
     private const string INPUT_AXIS_HORIZONTAL = "Horizontal";
     #endregion
 
+    #region Jump
+    [SerializeField] private protected float jumpImpulse;
+    #endregion
+
     // Start is called before the first frame update
     void Start() {
         rb = GetComponent<Rigidbody2D>();
@@ -19,6 +23,7 @@ public class Player_Controller : MonoBehaviour {
     // Update is called once per frame
     void Update() {
         MovePlayer();
+        JumpPlayer();
     }
 
     // Movement the player Object and Flip
@@ -53,5 +58,18 @@ public class Player_Controller : MonoBehaviour {
                 speed -= slowdown * Time.deltaTime;
             else speed = 0;
         }
+    }
+    
+    private void JumpPlayer() {
+        bool groundHit() {
+            RaycastHit2D groundHit = Physics2D.Raycast(transform.position, Vector2.down, 0.2f, 1 << 7);
+            RaycastHit2D groundHit2 = Physics2D.Raycast(new Vector2(transform.position.x - 0.2f, transform.position.y), Vector2.down, 0.2f, 1 << 7);
+            RaycastHit2D groundHit3 = Physics2D.Raycast(new Vector2(transform.position.x + 0.2f, transform.position.y), Vector2.down, 0.2f, 1 << 7);
+
+            if(groundHit.collider == true || groundHit2.collider == true || groundHit3.collider == true) return true;
+            else return false;
+        }
+
+        if(groundHit() == true && Input.GetKeyDown(KeyCode.Space)) rb.AddForce(Vector2.up * jumpImpulse, ForceMode2D.Impulse);
     }
 }
